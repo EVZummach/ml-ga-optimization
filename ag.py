@@ -69,37 +69,42 @@ def selection(generation: list) -> tuple:
     return 0
 
 if __name__ == '__main__':
-    t = []
-    n = 60
-    generations = 100
+    
+    for n in range(10, 100, 20):
+    #n = 60
+        print(n)
+        t = []
+        generations = 600
 
-    first_generation = [get_bits((random()*(upper_bound - lower_bound)+lower_bound)) for _ in range(n)]
-    prev_generation = first_generation
+        first_generation = [get_bits((random()*(upper_bound - lower_bound)+lower_bound)) for _ in range(n)]
+        prev_generation = first_generation
 
-    for i in range(generations):
-        
-        next_generation = []
+        for i in range(generations):
+            
+            next_generation = []
 
-        values = [get_float(val) for val in prev_generation]
-        fitness_values = [fitness(bits) for bits in prev_generation]
-        total_fit = sum(fitness_values)
-        average_fit = total_fit/len(fitness_values)
-        fitness_probabilty = [fit_val/total_fit for fit_val in fitness_values]
-        
-        while len(next_generation) < n:
-            f1 = prev_generation[np.random.choice(n, p=fitness_probabilty)]
-            f2 = prev_generation[np.random.choice(n, p=fitness_probabilty)]
-            f1_crs, f2_crs = crossover(f1, f2, np.random.uniform(low = 0.0, high=1.0))
-            f1_mut = mutation(f1_crs, np.random.uniform(low = 0.0, high=1.0))
-            f2_mut = mutation(f2_crs, np.random.uniform(low = 0.0, high=1.0))
-            next_generation.append(f1_mut)
-            next_generation.append(f2_mut)
-        
-        t.append(np.column_stack([i, np.reshape(values, (1, n)), np.reshape(fitness_values, (1, n)), average_fit]))
-        
+            values = [get_float(val) for val in prev_generation]
+            fitness_values = [fitness(bits) for bits in prev_generation]
+            total_fit = sum(fitness_values)
+            average_fit = total_fit/len(fitness_values)
+            fitness_probabilty = [fit_val/total_fit for fit_val in fitness_values]
+            
+            while len(next_generation) < n:
+                f1 = prev_generation[np.random.choice(n, p=fitness_probabilty)]
+                f2 = prev_generation[np.random.choice(n, p=fitness_probabilty)]
+                f1_crs, f2_crs = crossover(f1, f2, np.random.uniform(low = 0.0, high=1.0))
+                f1_mut = mutation(f1_crs, np.random.uniform(low = 0.0, high=1.0))
+                f2_mut = mutation(f2_crs, np.random.uniform(low = 0.0, high=1.0))
+                next_generation.append(f1_mut)
+                next_generation.append(f2_mut)
+            
+            if n %2 == 1:
+                next_generation.pop(np.random.randint(0, n))
 
-        prev_generation = next_generation
+            t.append(np.column_stack([i, np.reshape(values, (1, n)), np.reshape(fitness_values, (1, n)), average_fit]))
+            
+            prev_generation = next_generation
 
 #print(t)
-    np.savetxt(f'logs/run-n{n}-g{generations}.log', np.vstack(t))
+        np.savetxt(f'logs/run-n{n}-g{generations}.log', np.vstack(t))
 #print(mutation(get_bits(math.pi)))
